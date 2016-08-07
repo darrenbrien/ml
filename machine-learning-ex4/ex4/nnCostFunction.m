@@ -61,31 +61,34 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
+X = [ones(m, 1) X];
+z_2 = X * Theta1';
+a_2 = [ones(m,1) sigmoid(z_2)];
+z_3 = a_2 * Theta2';
+a_3 = sigmoid(z_3);
+Y = sparse(y, 1:m,1)';
+J = m^-1 * sum(diag((-Y' * log(a_3) - (1 - Y)' * log(1-a_3))));
 
+t1 = Theta1(:,2:end) .^2;
+t2 = Theta2(:,2:end) .^2;
+regularised = lambda * (2 * m)^-1 * ( sum(t1(:)) + sum(t2(:)));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+J = J + regularised
 
 % -------------------------------------------------------------
+
+d3 = a_3 - Y;
+d2 = d3 * Theta2 .* [ones(m, 1) sigmoidGradient(z_2)];
+d2 = d2(:,2:end);
+Theta1_grad = d2' * X * m^-1;
+Theta2_grad = d3' * a_2 * m^-1;
+
+Theta1_grad(:, 2:end) = Theta1_grad(:, 2:end) + lambda * m^-1 * Theta1(:, 2:end);
+Theta2_grad(:, 2:end) = Theta2_grad(:, 2:end) + lambda * m^-1 * Theta2(:, 2:end);
 
 % =========================================================================
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
-
 
 end
